@@ -7,11 +7,11 @@
     <div class="col-md-4">
       <mat-accordion class="example-headers-align">
         <div *ngFor="let team of teams">
-          <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel hideToggle="true" [expanded]="step === team.id" (opened)="setStep(team.id)">
             <mat-expansion-panel-header>
               <mat-panel-title>
                 <mat-icon>account_circle</mat-icon>
-                
+
               </mat-panel-title>
               <mat-panel-description>
                 Equipe n° {{team.id}}
@@ -20,6 +20,10 @@
             <div *ngFor="let player of team.players">
               {{player.playerID}} {{player.role}} {{player.HR}}
             </div>
+            <mat-action-row>
+              <button *ngIf="team.id != 1" mat-button color="warn" (click)="prevStep()">Previous</button>
+              <button mat-button color="primary" (click)="nextStep()">Next</button>
+            </mat-action-row>
           </mat-expansion-panel>
         </div>
       </mat-accordion>
