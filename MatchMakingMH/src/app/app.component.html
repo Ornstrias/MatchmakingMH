@@ -1,0 +1,29 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+  <img src="./assets/world.png">
+
+  <div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+      <mat-accordion class="example-headers-align">
+        <div *ngFor="let team of teams">
+          <mat-expansion-panel hideToggle="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon>account_circle</mat-icon>
+                
+              </mat-panel-title>
+              <mat-panel-description>
+                Equipe n° {{team.id}}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div *ngFor="let player of team.players">
+              {{player.playerID}} {{player.role}} {{player.HR}}
+            </div>
+          </mat-expansion-panel>
+        </div>
+      </mat-accordion>
+    </div>
+  </div>
+  <div class="col-md-4"></div>
+</div>
