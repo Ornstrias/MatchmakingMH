@@ -43,7 +43,7 @@ export class AppComponent implements OnInit {
             }
             tmpTab.push(tmp);
           }
-          this.createTeams(tmpTab);
+          this.createTeamsByLevels(tmpTab);
         },
         error => {
           let msg: string = "Echec de la récupération des données (services indisponibles ou en erreur)";
@@ -51,39 +51,7 @@ export class AppComponent implements OnInit {
         })
   }
 
-  // private createTeams(players:any[])
-  // {
-  //   let tmpTeams = [];
-  //   let tmp =
-  //   {
-  //     id:0,
-  //     players:[]
-  //   };
-  //   for(let i = 0; i < players.length; ++i)
-  //   {
-  //     tmp.players.push(players[i]);
-  //     if(tmp.players.length == 4)
-  //     {
-  //       tmp.id=Math.floor(i/4) + 1;
-  //       tmpTeams.push(tmp);
-  //       tmp = {
-  //         id:0,
-  //         players:[]
-  //       };
-  //     }
-  //   }
-  //   this.teams = tmpTeams;
-  //   console.log(this.teams);
-  // }
-
-  private createTeams(players: any[]) {
-    let tmpTeams = [];
-    let tmp =
-      {
-        id: 0,
-        players: []
-      };
-    
+  private dispatchPlayers(players: any[]) {
     for (let elem of players) {
       switch (elem.role) {
         case "DPS":
@@ -97,10 +65,63 @@ export class AppComponent implements OnInit {
           break;
       }
     }
+  }
+
+  private createTeams(players: any[]) {
+    let tmpTeams = [];
+    let tmp =
+      {
+        id: 0,
+        players: []
+      };
+
+    this.dispatchPlayers(players);
 
     for (let i = 0; i < players.length / 4; ++i) {
       tmp.players.push(this.dps.pop());
       tmp.players.push(this.dps.pop());
+      tmp.players.push(this.tanks.pop());
+      tmp.players.push(this.healers.pop());
+      tmp.id = i + 1;
+      tmpTeams.push(tmp);
+      tmp = {
+        id: 0,
+        players: []
+      };
+    }
+    this.teams = tmpTeams;
+  }
+
+  private compareLvl(a, b) {
+    return a.HR - b.HR;
+  }
+
+  private sortTabs() {
+    this.dps.sort(this.compareLvl);
+    this.tanks.sort(this.compareLvl);
+    this.healers.sort(this.compareLvl);
+  }
+
+  private createTeamsByLevels(players: any[]) {
+    let tmpTeams = [];
+    let firstPlayer: any;
+    let tmp =
+      {
+        id: 0,
+        players: []
+      };
+
+    this.dispatchPlayers(players);
+    this.sortTabs();
+
+    for (let i = 0; i < players.length / 4; ++i) {
+      firstPlayer = this.dps.shift();
+      tmp.players.push(firstPlayer);
+      if (firstPlayer.HR <= 25)
+        tmp.players.push(this.dps.pop());
+      else
+        tmp.players.push(this.dps.shift());
+
       tmp.players.push(this.tanks.pop());
       tmp.players.push(this.healers.pop());
       tmp.id = i + 1;
