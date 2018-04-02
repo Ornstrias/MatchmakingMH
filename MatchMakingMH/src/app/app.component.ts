@@ -9,6 +9,7 @@ import { Subject } from 'rxjs/Subject';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+
   private destroy$: Subject<boolean> = new Subject<boolean>();
   private teams = [];
   private step = 0;
@@ -21,7 +22,14 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.getAndEditJson();
   }
-
+  /**
+   * Méthode qui se lance à l'initialisation de la page.
+   * Cette méthode fait une requète HTTP sur le fichier json
+   * Le récupère et le parse
+   * Lorsque le parçage est terminé, la méthode de création des équipes est appelée 
+   * 
+   * @memberof AppComponent
+   */
   getAndEditJson() {
     let url: string = "assets/players.json";
     let tmpTab = [];
@@ -31,9 +39,6 @@ export class AppComponent implements OnInit {
         data => {
           let objArray: Object[] = <Object[]>data;
           let tmp;
-          let premadeLuck;
-          let alreadyPicked = [];
-          let j;
           for (let elem of objArray) {
             tmp = {
               playerID: elem['playerID'],
@@ -50,7 +55,13 @@ export class AppComponent implements OnInit {
           console.log(msg);
         })
   }
-
+  /**
+   * Méthode qui dispatch les joueurs dans les tableaux appropriés en fonction de leurs rôle dans l'équipe
+   * 
+   * @private
+   * @param {any[]} players 
+   * @memberof AppComponent
+   */
   private dispatchPlayers(players: any[]) {
     for (let elem of players) {
       switch (elem.role) {
@@ -66,8 +77,16 @@ export class AppComponent implements OnInit {
       }
     }
   }
-
-  private createTeams(players: any[]) {
+/**
+ * Méthode qui crée des équipes sans tenir compte des niveaux
+ * Elle vide les tableaux des rôles au fur et à mesure jusqu'à ce que toutes les équipes soient constituées
+ * Cette méthode n'est plus appellée dans la version finale.
+ * 
+ * @private
+ * @param {any[]} players 
+ * @memberof AppComponent
+ */
+private createTeams(players: any[]) {
     let tmpTeams = [];
     let tmp =
       {
@@ -92,17 +111,49 @@ export class AppComponent implements OnInit {
     this.teams = tmpTeams;
   }
 
-  private compareLvl(a, b) {
+/**
+ * Méthode de comparaison des niveaux des joueurs.
+ * On se sert de cette methode avec la fonction array.sort afin de trier les tableaux des joueurs par leurs niveaux
+ * 
+ * @private
+ * @param {any} a 
+ * @param {any} b 
+ * @returns 
+ * @memberof AppComponent
+ */
+private compareLvl(a, b) {
     return a.HR - b.HR;
   }
 
+  /**
+   * Méthode de triage des joueurs par niveaux.
+   * 
+   * @private
+   * @memberof AppComponent
+   */
   private sortTabs() {
     this.dps.sort(this.compareLvl);
     this.tanks.sort(this.compareLvl);
     this.healers.sort(this.compareLvl);
   }
 
-  private createTeamsByLevels(players: any[]) {
+/**
+ * Méthode qui crée les équipes en tenant compte de leurs niveaux
+ * Tant que le nombre de joueurs est suffisant pour le maintenir, l'algorithme fonctionne ainsi:
+ * 
+ * On recupère le premier joueur
+ * Si son niveau est < 25 on le met avec 3 joueurs > 50
+ * 
+ * Sinon on met 2 joueurs entre 25 et 50 et deux joueurs au dessus de 50
+ * 
+ * Les tests montrent ainsi qu'au minimun même lorsque le nombre de joueur n'est pas suffisant,
+ * on a généralement 2 véterans et 2 jeunes joueurs par équipe ce qui répond à la problématique.
+ * 
+ * @private
+ * @param {any[]} players 
+ * @memberof AppComponent
+ */
+private createTeamsByLevels(players: any[]) {
     let tmpTeams = [];
     let firstPlayer: any;
     let tmp =
@@ -135,8 +186,13 @@ export class AppComponent implements OnInit {
   }
 
 
-
-  setStep(index: number) {
+/**
+ * Les méthode Step servent à faire marcher les boutons prev et next des mat-extension-panel
+ * 
+ * @param {number} index 
+ * @memberof AppComponent
+ */
+setStep(index: number) {
     this.step = index;
   }
 
@@ -147,8 +203,14 @@ export class AppComponent implements OnInit {
   prevStep() {
     this.step--;
   }
-
-  ngOnDestroy() {
+/**
+ * Méthode triggered à la destruction de la page.
+ * Elle sert à unsubcribe l'observable de la requete HTML
+ * Gestion de mémoire de l'application.
+ * 
+ * @memberof AppComponent
+ */
+ngOnDestroy() {
     this.destroy$.next(true);
     this.destroy$.unsubscribe();
   }

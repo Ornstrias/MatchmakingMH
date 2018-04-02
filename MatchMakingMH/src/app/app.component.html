@@ -22,7 +22,7 @@
             </div>
             <mat-action-row>
               <button *ngIf="team.id != 1" mat-button color="warn" (click)="prevStep()">Previous</button>
-              <button mat-button color="primary" (click)="nextStep()">Next</button>
+              <button *ngIf="team.id != 25" mat-button color="primary" (click)="nextStep()">Next</button>
             </mat-action-row>
           </mat-expansion-panel>
         </div>
